@@ -154,13 +154,3 @@ src/config.ts
 
 Self-contained single-file CLI at `cli/fbcli.ts`. Independent of the MCP server — reads its own `.env`.
 
----
-
-## Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-- Create a branch: `git checkout -b feature/YourFeature`
-- Commit your changes: `git commit -m 'feat: add new feature'`
-- Push to the branch: `git push origin feature/YourFeature`
-- Open a pull request
