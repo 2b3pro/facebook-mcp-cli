@@ -116,3 +116,6 @@ Commands that accept text content (messages, captions) or ID lists support **std
 - No explicit error handling — Facebook API error responses pass through as-is
 - Multi-step video operations (reels, stories) fail at the step that errors — partial state is returned with video_id for retry
 - MCP tools return `{ content: [{ type: "text", text: JSON.stringify(data) }] }`
+
+## References
+- Graph API - https://developers.facebook.com/docs/graph-api (use jina tool to fetch)
