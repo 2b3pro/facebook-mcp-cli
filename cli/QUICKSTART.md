@@ -31,11 +31,17 @@ fbcli posts mybusiness
 # New post
 fbcli post mybusiness "Hello from the CLI!"
 
+# Post from a file (stdin)
+cat draft.txt | fbcli post mybusiness
+
 # Update existing
 fbcli update-post mybusiness 123456_789 "Updated message"
 
 # Schedule for later (Unix timestamp)
 fbcli schedule mybusiness "Coming soon!" 1738900800
+
+# Schedule with message from stdin
+cat announcement.txt | fbcli schedule mybusiness 1738900800
 
 # Delete
 fbcli delete-post mybusiness 123456_789
@@ -50,12 +56,20 @@ fbcli comments mybusiness 123456_789
 # Reply
 fbcli reply mybusiness 111_222 "Thanks for your comment!"
 
+# Reply from stdin
+echo "Thanks!" | fbcli reply mybusiness 111_222
+
 # Hide spam
 fbcli hide-comment mybusiness 111_222
 
 # Bulk operations (comma-separated IDs, no spaces)
 fbcli bulk-hide mybusiness 111_222,333_444,555_666
 fbcli bulk-delete mybusiness 111_222,333_444
+
+# Bulk hide with IDs piped from another command
+fbcli comments mybusiness 123456_789 \
+  | jq -r '.data[].id' \
+  | fbcli bulk-hide mybusiness
 ```
 
 ### Analytics
@@ -95,9 +109,11 @@ for page in $(fbcli pages | jq -r '.[].page_name'); do
   fbcli post "$page" "New announcement!"
 done
 
-# Hide all comments matching a pattern
+# Hide all comments matching a pattern (direct stdin pipe)
 fbcli comments mybusiness 123456_789 \
   | jq -r '.data[] | select(.message | test("spam"; "i")) | .id' \
-  | paste -sd, - \
-  | xargs -I{} fbcli bulk-hide mybusiness {}
+  | fbcli bulk-hide mybusiness
+
+# DM from a template file
+cat welcome.txt | fbcli dm mybusiness 9876543210
 ```

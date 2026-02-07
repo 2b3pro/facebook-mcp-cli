@@ -69,6 +69,8 @@ src/config.ts
 
 Self-contained standalone CLI at `cli/fbcli.ts`. Reads its own `.env` file from the cli/ directory. Uses the same Graph API patterns but is independent of the MCP server code.
 
+Commands that accept text content (messages, captions) or ID lists support **stdin fallback** — when the arg is omitted or `-`, the CLI reads from stdin. This enables Unix piping: `cat draft.txt | fbcli post mypage`. Three helpers handle this: `readStdin()` (TTY-aware), `resolveText()` (for messages), `resolveIds()` (for bulk ID lists with newline normalization).
+
 ## Adding a New Tool
 
 1. If needed, add a helper function or adjust `graphApi()` call in `src/api.ts`

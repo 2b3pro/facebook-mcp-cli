@@ -47,23 +47,23 @@ fbcli pages                              # List all configured pages
 
 ```bash
 fbcli posts <page>                       # List recent posts
-fbcli post <page> <message>              # Create text post
-fbcli post-image <page> <url> <caption>  # Post image with caption
-fbcli update-post <page> <post_id> <msg> # Update post message
+fbcli post <page> [message]              # Create text post
+fbcli post-image <page> <url> [caption]  # Post image with caption
+fbcli update-post <page> <post_id> [msg] # Update post message
 fbcli delete-post <page> <post_id>       # Delete post
-fbcli schedule <page> <msg> <timestamp>  # Schedule future post (Unix timestamp)
+fbcli schedule <page> [msg] <timestamp>  # Schedule future post (Unix timestamp)
 ```
 
 ### Comments
 
 ```bash
 fbcli comments <page> <post_id>          # List comments on post
-fbcli reply <page> <comment_id> <msg>    # Reply to comment
+fbcli reply <page> <comment_id> [msg]    # Reply to comment
 fbcli delete-comment <page> <comment_id> # Delete comment
 fbcli hide-comment <page> <comment_id>   # Hide comment
 fbcli unhide-comment <page> <comment_id> # Unhide comment
-fbcli bulk-delete <page> <id1,id2,...>   # Bulk delete (comma-separated)
-fbcli bulk-hide <page> <id1,id2,...>     # Bulk hide (comma-separated)
+fbcli bulk-delete <page> [id1,id2,...]   # Bulk delete (comma-sep or stdin)
+fbcli bulk-hide <page> [id1,id2,...]     # Bulk hide (comma-sep or stdin)
 ```
 
 ### Analytics
@@ -85,8 +85,34 @@ fbcli comment-count <page> <post_id>     # Comment count
 ### Messaging
 
 ```bash
-fbcli dm <page> <user_id> <message>      # Send DM
+fbcli dm <page> <user_id> [message]      # Send DM
 ```
+
+## Stdin Support
+
+Commands with `[brackets]` accept input via stdin when the argument is omitted or replaced with `-`. This enables piping and composition:
+
+```bash
+# Post from a file
+cat draft.txt | fbcli post mybusiness
+
+# Reply with piped message
+echo "Thanks for the feedback!" | fbcli reply mybusiness 123_456
+
+# DM from stdin
+echo "Hello" | fbcli dm mybusiness 9876543210
+
+# Schedule with message from stdin
+cat announcement.txt | fbcli schedule mybusiness 1771069200
+
+# Bulk hide with IDs from another command
+fbcli comments mybusiness 123_456 | jq -r '.data[].id' | fbcli bulk-hide mybusiness
+
+# Bulk delete from a file (one ID per line)
+cat ids.txt | fbcli bulk-delete mybusiness
+```
+
+Bulk commands accept newline-separated, comma-separated, or mixed ID formats from stdin.
 
 ## Output
 

@@ -6,6 +6,7 @@ Token-optimized reference for LLM tool use. Binary: `fb` or `facebook`. Output: 
 
 All commands except `pages` take `<page>` (slug from FACEBOOK_ASSETS) as first arg.
 Multi-word args (messages, captions) are space-joined from remaining args.
+Args in `[brackets]` accept stdin when omitted or replaced with `-`.
 
 ## Commands
 
@@ -17,22 +18,22 @@ fb pages                                    → [{page_name, display_name, fb_pa
 ### Posts
 ```
 fb posts <page>                             → {data: [{id, message, created_time}]}
-fb post <page> <message...>                 → {id}
-fb post-image <page> <url> <caption...>     → {id, post_id}
-fb update-post <page> <post_id> <msg...>    → {success: true}
+fb post <page> [message...]                 → {id}
+fb post-image <page> <url> [caption...]     → {id, post_id}
+fb update-post <page> <post_id> [msg...]    → {success: true}
 fb delete-post <page> <post_id>             → {success: true}
-fb schedule <page> <msg...> <unix_ts>       → {id}  # last arg = timestamp
+fb schedule <page> [msg...] <unix_ts>       → {id}  # last arg = timestamp
 ```
 
 ### Comments
 ```
 fb comments <page> <post_id>                → {data: [{id, message, from, created_time}]}
-fb reply <page> <comment_id> <msg...>       → {id}
+fb reply <page> <comment_id> [msg...]       → {id}
 fb delete-comment <page> <comment_id>       → {success: true}
 fb hide-comment <page> <comment_id>         → {success: true}
 fb unhide-comment <page> <comment_id>       → {success: true}
-fb bulk-delete <page> <id1,id2,...>          → [{comment_id, result}]  # comma-separated, no spaces
-fb bulk-hide <page> <id1,id2,...>            → [{comment_id, result}]
+fb bulk-delete <page> [id1,id2,...]         → [{comment_id, result}]  # comma-sep or stdin (newline-sep)
+fb bulk-hide <page> [id1,id2,...]           → [{comment_id, result}]
 ```
 
 ### Analytics
@@ -52,8 +53,23 @@ fb comment-count <page> <post_id>           → {comment_count: N}
 
 ### Messaging
 ```
-fb dm <page> <user_id> <message...>         → {recipient_id, message_id}
+fb dm <page> <user_id> [message...]         → {recipient_id, message_id}
 ```
+
+## Stdin Support
+
+Commands with `[brackets]` read from stdin when the arg is omitted or `-`:
+
+```sh
+cat draft.txt | fb post mypage              # message from file
+echo "Updated" | fb update-post mypage ID   # message from pipe
+echo "Thanks!" | fb reply mypage CID        # reply from pipe
+echo "Hello" | fb dm mypage UID             # DM from pipe
+cat msg.txt | fb schedule mypage 1771069200 # scheduled message from stdin
+fb comments mypage PID | jq -r '.data[].id' | fb bulk-hide mypage  # IDs from pipe
+```
+
+Bulk commands accept newline-separated, comma-separated, or mixed ID formats from stdin.
 
 ## ID Formats
 

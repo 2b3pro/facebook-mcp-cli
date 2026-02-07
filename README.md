@@ -132,6 +132,14 @@ bun run cli/fbcli.ts pages
 bun run cli/fbcli.ts posts mybusiness
 ```
 
+Commands that accept text content or ID lists support **stdin piping** — omit the argument and pipe input instead:
+
+```bash
+cat draft.txt | fbcli post mybusiness
+echo "Thanks!" | fbcli reply mybusiness 123_456
+fbcli comments mybusiness 123_456 | jq -r '.data[].id' | fbcli bulk-hide mybusiness
+```
+
 ---
 
 ## Architecture
